@@ -5,12 +5,14 @@ from typing import Dict, Iterator, List, Optional, Union, Tuple
 import sys
 
 import numpy as np
+import torch
 from torch.utils.data import DataLoader, Dataset
 from rdkit import Chem
+import pandas as pd
 
 from .sampler import MoleculeSampler
 sys.path.append("../")
-from features.feature_extractor import make_mole
+from features.feature_extractor import make_mole, fingerprint_features
 from features.graph_featurization import BatchMolGraph, MolGraph
 
 
@@ -164,6 +166,30 @@ class MoleculeDataset(Dataset):
         Gets one or more :class:`MoleculeDatapoint`\ s via an index or slice.
         """
         return self._data[item]
+
+class MoleculeBitMapDataset(Dataset):
+    """Smile Dataset Loader relative to the sequential one hot encoding of fingerprint_features """
+
+    def __init__(self,
+                 smiles: List[str],
+                 targets: List[Optional[float]] = None,
+                 max_len: int = 64) -> None:
+        self.smiles = smiles
+        self.targets = targets
+        self.max_len = max_len
+
+    def __len__(self) -> int:
+        return len(self.smiles)
+
+    def get_labels(self) -> pd.DataFrame:
+        return pd.DataFrame(self.targets)
+
+    def __getitem__(self, idx: int) -> torch.Tensor:
+        smile, target = self.smiles[idx], self.targets[idx]
+        smile = np.array(fingerprint_features(smile[0], size=128)).tolist()
+        return torch.tensor(smile, dtype=torch.long), torch.tensor(
+            target, dtype=torch.float
+        )
 
 def construct_molecule_batch(data: List[MoleculeDatapoint]) -> MoleculeDataset:
     """
