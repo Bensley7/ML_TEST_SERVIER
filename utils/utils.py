@@ -25,13 +25,13 @@ def get_attributes(path: str, smiles_columns, target_columns):
 
             all_smiles.append(smiles)
             all_targets.append(targets)
-
+    
     return all_smiles, all_targets
 
 
 def get_data_from_smile(smile: str, cfg) -> MoleculeDataset:
-    all_smiles = [smile]
-    all_targets = [0]
+    all_smiles = [[smile]]
+    all_targets = [[0.0]]
     data = MoleculeDataset([
         MoleculeDatapoint(
             smiles=smiles,

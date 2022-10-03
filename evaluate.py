@@ -18,7 +18,7 @@ def eval(opt):
     #Read config file
     cfg = read_cfg(opt.config_file, opt.opts)
     if cfg.MODEL.name == "mpn_ffd":
-        evalmpn(**vars(opt))
+        evalmpn(opt)
 
 if __name__ == "__main__":
     args = parse_opt()

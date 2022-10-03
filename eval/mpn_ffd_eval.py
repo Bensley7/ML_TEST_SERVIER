@@ -58,7 +58,7 @@ def eval_model(model_path, val_data_path, config_file, opts):
         print('Moving model to cuda')
     device = torch.device(cfg.MODEL.device)
     #Load Data
-    model = load_checkpoint(model_path, device=device)
+    model = load_checkpoint(model_path, cfg, device=device)
     model.eval()
     
     dataset_type = "classification"

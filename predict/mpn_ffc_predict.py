@@ -1,3 +1,4 @@
+from cProfile import label
 from typing import List
 import sys
 import argparse
@@ -56,7 +57,7 @@ def predict(
 
     return preds
 
-def predict_from_model(model_path: str, smile: str, config_file: str, opts):
+def predict_single(model_path: str, smile: str, config_file: str, opts):
     #Read config file
     cfg = read_cfg(config_file, opts)
     
@@ -69,12 +70,10 @@ def predict_from_model(model_path: str, smile: str, config_file: str, opts):
         print('Moving model to cuda')
     device = torch.device(cfg.MODEL.device)
     #Load Data
-    model = load_checkpoint(model_path, device=device)
+    model = load_checkpoint(model_path, cfg, device=device)
     model.eval()
     
-    dataset_type = "classification"
-    if len(cfg.DATA_DIGEST.labels_name) > 1:
-        dataset_type = "multiclass"
+    print("model loaded")
 
     pred_data_loader = MoleculeDataLoader(
         dataset=pred_data,
@@ -82,7 +81,16 @@ def predict_from_model(model_path: str, smile: str, config_file: str, opts):
         num_workers=1,
     )
     out = predict(model, pred_data_loader)
-    print("Property of smile ", smile, "is ", out[0])
+    
+    res = None
+    if isinstance(out[0][0], list):
+        res = {label_name: (prob > 0.5) * 1 for label_name, prob 
+                            in zip(cfg.DATA_DIGEST.labels_name, out[0][0])}
+    else:
+        res = {cfg.DATA_DIGEST.labels_name[0]: (out[0][0] > 0.5) * 1}
+
+    return res
+
 
 
 def parse_opt():
@@ -98,7 +106,7 @@ def parse_opt():
 
 
 def pred(opt):
-    predict_from_model(**vars(opt))
+    return predict_single(**vars(opt))
 
 if __name__ == "__main__":
     args = parse_opt()

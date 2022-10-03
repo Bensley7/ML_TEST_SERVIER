@@ -18,7 +18,7 @@ def pred(opt):
     #Read config file
     cfg = read_cfg(opt.config_file, opt.opts)
     if cfg.MODEL.name == "mpn_ffd":
-        predmpn(**vars(opt))
+        print(predmpn(opt))
 
 if __name__ == "__main__":
     args = parse_opt()
