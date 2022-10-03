@@ -100,20 +100,18 @@ servier predict  --model_path ./models/model_name.pt --smile 'NC(=O)NC(Cc1ccccc1
 ```
 
 #### Result
-ATTENTION_LSTM - basic features : M1
-MPN_FFC_SINGLE : M2
-MPN_FFC_multi : M3
+- ATTENTION_LSTM - basic features : M1
+- MPN_FFC_SINGLE : M2
+- MPN_FFC_multi : M3
 
 Method  | metric  | score
 ------------- |------------- | -------------
 M1      | accuracy  | 0.802
 M1      | f1 score  | 0.45
 M1      | ROC CURVE  | 0.62
-
 M2      | accuracy  | 0.83
 M2      | f1 score  | 0.93
 M2      | ROC CURVE  | 0.9
-
 M3      | accuracy  | 0.81
 M3      | f1 score  | 0.898
 
