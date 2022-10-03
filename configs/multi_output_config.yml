@@ -1,0 +1,10 @@
+DATA_DIGEST:
+  labels_name: ("P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8", "P9")
+
+MODEL:
+  loss_function: "cross_entropy"
+  name: "mpn_ffd"
+  TRAINING:
+    metrics: ("accuracy", "f1")
+
+

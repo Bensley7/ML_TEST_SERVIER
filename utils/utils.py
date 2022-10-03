@@ -1,14 +1,17 @@
 import csv
 from tqdm import tqdm
-from typing import List
+from typing import Dict, List
+from collections import defaultdict
+
+from torch.utils.data import DataLoader
 
 import sys
 sys.path.append("..")
 
-from dataset.loader import MoleculeDataset, MoleculeDatapoint
+from dataset.loader import MoleculeDataset, MoleculeDatapoint, MoleculeBitMapDataset
+from models.metrics import get_metric_func
 
-
-def get_attributes(path: str, smiles_columns: List(str), target_columns: List(str)):
+def get_attributes(path: str, smiles_columns, target_columns):
     # Load data
     with open(path) as f:
         reader = csv.DictReader(f)
@@ -24,6 +27,20 @@ def get_attributes(path: str, smiles_columns: List(str), target_columns: List(st
             all_targets.append(targets)
 
     return all_smiles, all_targets
+
+
+def get_data_from_smile(smile: str, cfg) -> MoleculeDataset:
+    all_smiles = [smile]
+    all_targets = [0]
+    data = MoleculeDataset([
+        MoleculeDatapoint(
+            smiles=smiles,
+            targets=targets,
+            ) for i, (smiles, targets) in tqdm(enumerate(zip(all_smiles, all_targets)),
+                                            total=len(all_smiles))
+        ])
+    return data 
+
 
 def get_data(path: str, cfg, skip_invalid_smiles = True) -> MoleculeDataset:
     """
@@ -58,26 +75,20 @@ def get_data(path: str, cfg, skip_invalid_smiles = True) -> MoleculeDataset:
     return data
 
 
-def prepare_smile_data(
-    path: str,
-    cfg,
-    skip_invalid_smiles = True,
-    max_len: int = 64,
-):
+def get_molecule_bit_map_loader(path: str, cfg, max_len: int = 64):
+
     smiles_columns = [cfg.DATA_DIGEST.smiles_name]
     target_columns = cfg.DATA_DIGEST.labels_name
 
     all_smiles, all_targets = get_attributes(path, smiles_columns, target_columns)
 
-    data = list(all_smiles, all_targets)
-
-    smile_dataset = SmileDataset(data, max_len)
+    molecule_bit_map_dataset = MoleculeBitMapDataset(all_smiles, all_targets)
     
     return DataLoader(
-        smile_dataset,
-        batch_size=batch_size,
+        molecule_bit_map_dataset,
+        batch_size=cfg.MODEL.TRAINING.batch_size,
         shuffle=False,
-        num_workers=4,
+        num_workers=cfg.MODEL.num_workers,
     )
 
 def filter_invalid_smiles(data: MoleculeDataset) -> MoleculeDataset:
@@ -90,3 +101,53 @@ def filter_invalid_smiles(data: MoleculeDataset) -> MoleculeDataset:
                             if all(s != '' for s in datapoint.smiles) and all(m is not None for m in datapoint.mol)
                             and all(m.GetNumHeavyAtoms() > 0 for m in datapoint.mol if not isinstance(m, tuple))
                             and all(m[0].GetNumHeavyAtoms() + m[1].GetNumHeavyAtoms() > 0 for m in datapoint.mol if isinstance(m, tuple))])
+
+
+def evaluate_predictions(preds: List[List[float]],
+                         targets: List[List[float]],
+                         metrics: List[str],
+                         dataset_type: str) -> Dict[str, List[float]]:
+    """
+    Evaluates predictions using a metric function after filtering out invalid targets.
+
+    :param preds: A list of lists of shape :code:`(data_size, num_tasks)` with model predictions.
+    :param targets: A list of lists of shape :code:`(data_size, num_tasks)` with targets.
+    :param num_tasks: Number of tasks.
+    :return: A dictionary mapping each metric in :code:`metrics` to a list of values for each task.
+    """
+
+    metric_to_func = {metric: get_metric_func(metric) for metric in metrics}
+
+    if len(preds) == 0:
+        return {metric: [float('nan')] for metric in metrics}
+
+    valid_preds = []
+    valid_targets = []
+    for j in range(len(preds)):
+        if targets[j][0] is not None:  # Skip those without targets
+            valid_preds.append(preds[j][0])
+            valid_targets.append(targets[j][0])
+
+    results = defaultdict(list)
+    
+    if dataset_type == 'classification':
+        nan = False
+        if all(target == 0 for target in valid_targets) or all(target == 1 for target in valid_targets):
+            nan = True
+        if all(pred == 0 for pred in valid_preds) or all(pred == 1 for pred in valid_preds):
+            nan = True
+
+        if nan:
+            for metric in metrics:
+                results[metric].append(float('nan'))
+
+    for metric, metric_func in metric_to_func.items():
+        if dataset_type == 'multiclass' and metric == 'cross_entropy':
+            results[metric].append(metric_func(valid_targets, valid_preds,
+                                            labels=list(range(len(valid_preds[0])))))
+        else:
+            results[metric].append(metric_func(valid_targets, valid_preds))
+
+    results = dict(results)
+
+    return results
