@@ -1,12 +1,14 @@
 from typing import List
+import sys
 
 import torch
 from tqdm import tqdm
 import numpy as np
 
-from ..dataset.loader import MoleculeDataLoader, MoleculeDataset
-from ..models.model import MoleculeModel
-from ..models.utils import activate_dropout
+sys.path.append("../")
+from dataset.loader import MoleculeDataLoader, MoleculeDataset
+from models.model import MoleculeModel
+from models.utils import activate_dropout
 
 
 def predict(

@@ -1,12 +1,14 @@
 from collections import defaultdict
 import logging
 from typing import Dict, List
+import sys
 
-from ..dataset.loader import MoleculeDataLoader
-from ..models.model import MoleculeModel
-from ..models.metrics import get_metric_func
+sys.path.append("../")
+from dataset.loader import MoleculeDataLoader
+from models.model import MoleculeModel
+from models.metrics import get_metric_func
 
-from . import predict
+from .predict import predict
 
 def evaluate_predictions(preds: List[List[float]],
                          targets: List[List[float]],
@@ -21,7 +23,6 @@ def evaluate_predictions(preds: List[List[float]],
     :return: A dictionary mapping each metric in :code:`metrics` to a list of values for each task.
     """
 
-    metrics = cfg.MODEL.TRAINING.metrics
     metric_to_func = {metric: get_metric_func(metric) for metric in metrics}
 
     if len(preds) == 0:
@@ -76,7 +77,6 @@ def evaluate(model: MoleculeModel,
     preds = predict(
         model=model,
         data_loader=data_loader,
-        dataset_type=dataset_type,
     )
 
     results = evaluate_predictions(

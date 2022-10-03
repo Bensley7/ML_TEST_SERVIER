@@ -23,7 +23,7 @@ def train_model(
     test_data_path,
     config_file,
     opts,
-    model_path="models/",
+    model_path="mol_models/",
     model_name="model1.pt",
 ) -> None:
 
@@ -51,12 +51,12 @@ def train_model(
     print(f'Total size = {(len(train_data) + len(val_data) + len(test_data)):,} | '
           f'train size = {len(train_data):,} | val size = {len(val_data):,} | test size = {len(test_data):,}')
 
-    # Get loss function
-    loss_func = get_loss_func(cfg.DATA_DIGEST)
-
     dataset_type = "classification"
     if len(cfg.DATA_DIGEST.labels_name) > 1:
         dataset_type = "multiclass"
+
+    # Get loss function
+    loss_func = get_loss_func(cfg.MODEL.loss_function, dataset_type)
 
     # Set up test set evaluation
     _, test_targets = test_data.smiles(), test_data.targets()
@@ -65,19 +65,19 @@ def train_model(
     train_data_loader = MoleculeDataLoader(
         dataset=train_data,
         batch_size=cfg.MODEL.TRAINING.batch_size,
-        num_workers=cfg.MODEL.TRAINING.num_workers,
+        num_workers=cfg.MODEL.num_workers,
         class_balance=cfg.MODEL.TRAINING.class_balance,
         shuffle=True
     )
     val_data_loader = MoleculeDataLoader(
         dataset=val_data,
         batch_size=cfg.MODEL.TRAINING.batch_size,
-        num_workers=cfg.MODEL.TRAINING.num_workers,
+        num_workers=cfg.MODEL.num_workers,
     )
     test_data_loader = MoleculeDataLoader(
         dataset=test_data,
         batch_size=cfg.MODEL.TRAINING.batch_size,
-        num_workers=cfg.MODEL.TRAINING.num_workers,
+        num_workers=cfg.MODEL.num_workers,
     )
 
     if cfg.MODEL.TRAINING.class_balance:
@@ -100,7 +100,7 @@ def train_model(
     optimizer = build_optimizer(model, cfg.MODEL.TRAINING)
 
     # Learning rate schedulers
-    scheduler = build_lr_scheduler(optimizer, len(train_data), cfg.MODEL.TRAINING)
+    scheduler = build_lr_scheduler(optimizer, cfg.MODEL.TRAINING, len(train_data))
 
     # Run training
     best_score =  -float('inf')
@@ -162,14 +162,14 @@ def train_model(
 
 def parse_opt():
     parser = argparse.ArgumentParser(description=".")
-    parser.add_argument("train_data_path", help="train dataset path", typ=str)
-    parser.add_argument("valid_data_path", help="valid dataset path", typr=str)
-    parser.add_argument("test_data_path", help="test dataset path", type=str)
+    parser.add_argument("--train_data_path", help="train dataset path", type=str)
+    parser.add_argument("--val_data_path", help="valid dataset path", type=str)
+    parser.add_argument("--test_data_path", help="test dataset path", type=str)
 
     parser.add_argument("--config_file", default="", help="path to config file", type=str)
     parser.add_argument("opts", help="Modify config options using the command-line", default=None,
                         nargs=argparse.REMAINDER)
-    parser.add_argument('--model_path', type=str, default="models/", help='directory to save the model')
+    parser.add_argument('--model_path', type=str, default="mol_models/", help='directory to save the model')
     parser.add_argument('--model_name', type=str, default = "model1.pt", help='pytorch model name')
 
     args = parser.parse_args()

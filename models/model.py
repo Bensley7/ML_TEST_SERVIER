@@ -1,11 +1,15 @@
 from typing import List, Union, Tuple
+import sys
 
 import numpy as np
 from rdkit import Chem
 import torch
 import torch.nn as nn
 
+sys.path.append("../")
 from .utils import get_activation_function, initialize_weights
+from features.graph_featurization import BatchMolGraph
+from .mpn import MPN
 
 class MoleculeModel(nn.Module):
     """A :class:`MoleculeModel` is a model which contains a message passing network following by feed-forward layers."""

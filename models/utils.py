@@ -23,7 +23,7 @@ def activate_dropout(module: nn.Module, dropout_prob: float):
     """
     Set p of dropout layers and set to train mode during inference for uncertainty estimation.
 
-    :param model: A :class:`~chemprop.models.model.MoleculeModel`.
+    :param model: A :class:`MoleculeModel`.
     :param dropout_prob: A float on (0,1) indicating the dropout probability.
     """
     if isinstance(module, nn.Dropout):
@@ -81,7 +81,7 @@ def index_select_ND(source: torch.Tensor, index: torch.Tensor) -> torch.Tensor:
 
     return target
 
-def get_loss_func(cfg) -> Callable:
+def get_loss_func(loss_function: str, dataset_type: str) -> Callable:
     """
     Gets the loss function corresponding to a given dataset type.
 
@@ -98,11 +98,7 @@ def get_loss_func(cfg) -> Callable:
             "cross_entropy": nn.CrossEntropyLoss(reduction="none")
         }
     }
-    loss_function = None
-    if (len(cfg.labels_name) == 1):
-        loss_function = supported_loss_functions["classification"].get(cfg.MODEL.loss_function)
-    elif (len(cfg.labels_name) > 1):
-        loss_function = supported_loss_functions["multiclass"].get(cfg.MODEL.loss_function)
+    loss_function = supported_loss_functions[dataset_type].get(loss_function)
     return loss_function
 
 

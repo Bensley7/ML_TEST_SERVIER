@@ -1,10 +1,12 @@
 import sys, os
 import logging
 from config import cfg
+import sys
 
 import torch
 
-from ..models.model import MoleculeModel
+sys.path.append("../")
+from models.model import MoleculeModel
 
 def setup_logger(name, save_dir, distributed_rank):
     logger = logging.getLogger(name)

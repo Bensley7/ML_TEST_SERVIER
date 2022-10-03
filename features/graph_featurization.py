@@ -77,9 +77,6 @@ class BatchMolGraph:
         """
         param mol_graphs: A list of :class:`MolGraph`\ s from which to construct the :class:`BatchMolGraph`.
         """
-        self.overwrite_default_atom_features = mol_graphs[0].overwrite_default_atom_features
-        self.overwrite_default_bond_features = mol_graphs[0].overwrite_default_bond_features
-        self.is_reaction = mol_graphs[0].is_reaction
         self.atom_fdim = get_atom_fdim()
         self.bond_fdim = get_bond_fdim()
 
