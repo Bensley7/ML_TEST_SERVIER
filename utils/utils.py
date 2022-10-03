@@ -1,5 +1,6 @@
 import csv
 from tqdm import tqdm
+from typing import List
 
 import sys
 sys.path.append("..")
@@ -7,20 +8,7 @@ sys.path.append("..")
 from dataset.loader import MoleculeDataset, MoleculeDatapoint
 
 
-def get_data(path: str, cfg, skip_invalid_smiles = True) -> MoleculeDataset:
-    """
-    Gets SMILES and target values from a CSV file.
-    :param path: Path to a CSV file.
-    :param cfg: config data.
-    :param skip_invalid_smiles: Whether to skip and filter out invalid smiles.
-    :return: A :class:`dataset.loader.MoleculeDataset` containing SMILES and target values along
-             with other info such as additional features when desired.
-    """
-
-    # Prefer explicit function arguments but default to args if not provided
-    smiles_columns = [cfg.DATA_DIGEST.smiles_name]
-    target_columns = cfg.DATA_DIGEST.labels_name
-
+def get_attributes(path: str, smiles_columns: List(str), target_columns: List(str)):
     # Load data
     with open(path) as f:
         reader = csv.DictReader(f)
@@ -35,13 +23,29 @@ def get_data(path: str, cfg, skip_invalid_smiles = True) -> MoleculeDataset:
             all_smiles.append(smiles)
             all_targets.append(targets)
 
-        data = MoleculeDataset([
-            MoleculeDatapoint(
-                smiles=smiles,
-                targets=targets,
-                ) for i, (smiles, targets) in tqdm(enumerate(zip(all_smiles, all_targets)),
-                                               total=len(all_smiles))
-            ])
+    return all_smiles, all_targets
+
+def get_data(path: str, cfg, skip_invalid_smiles = True) -> MoleculeDataset:
+    """
+    Gets SMILES and target values from a CSV file.
+    :param path: Path to a CSV file.
+    :param cfg: config data.
+    :param skip_invalid_smiles: Whether to skip and filter out invalid smiles.
+    :return: A :class:`dataset.loader.MoleculeDataset` containing SMILES and target values along
+             with other info such as additional features when desired.
+    """
+
+    smiles_columns = [cfg.DATA_DIGEST.smiles_name]
+    target_columns = cfg.DATA_DIGEST.labels_name
+
+    all_smiles, all_targets = get_attributes(path, smiles_columns, target_columns)
+    data = MoleculeDataset([
+        MoleculeDatapoint(
+            smiles=smiles,
+            targets=targets,
+            ) for i, (smiles, targets) in tqdm(enumerate(zip(all_smiles, all_targets)),
+                                            total=len(all_smiles))
+        ])
 
     # Filter out invalid SMILES
     if skip_invalid_smiles:
@@ -53,6 +57,28 @@ def get_data(path: str, cfg, skip_invalid_smiles = True) -> MoleculeDataset:
 
     return data
 
+
+def prepare_smile_data(
+    path: str,
+    cfg,
+    skip_invalid_smiles = True,
+    max_len: int = 64,
+):
+    smiles_columns = [cfg.DATA_DIGEST.smiles_name]
+    target_columns = cfg.DATA_DIGEST.labels_name
+
+    all_smiles, all_targets = get_attributes(path, smiles_columns, target_columns)
+
+    data = list(all_smiles, all_targets)
+
+    smile_dataset = SmileDataset(data, max_len)
+    
+    return DataLoader(
+        smile_dataset,
+        batch_size=batch_size,
+        shuffle=False,
+        num_workers=4,
+    )
 
 def filter_invalid_smiles(data: MoleculeDataset) -> MoleculeDataset:
     """

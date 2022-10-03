@@ -6,11 +6,13 @@ from rdkit import Chem
 import torch
 import torch.nn as nn
 from torch.nn import functional as F
+import pytorch_lightning as pl
 
 sys.path.append("../")
 from .utils import get_activation_function, initialize_weights
 from features.graph_featurization import BatchMolGraph
 from .mpn import MPN
+from .metrics import get_metric_func
 
 class MoleculeModel(nn.Module):
     """A :class:`MoleculeModel` is a model which contains a message passing network following by feed-forward layers."""
@@ -124,7 +126,7 @@ class AttentionPooling(nn.Module):
         return v
 
 
-class MolLSTM(nn.Module):
+class MoleculeAttentionLSTM(pl.LightningModule):
     def __init__(
         self,
         d_out: int = 1,
@@ -133,9 +135,11 @@ class MolLSTM(nn.Module):
         hidden_lstm_size: int = 128,
         p_dropout: float = 0.25,
         att_polling_size: int = 256,
+        metrics: List[str] = None,
+        lr: float = 1e-4,
     ) -> None:
         super().__init__()
-
+        self.save_hyperparameters()
         self.embeddings = torch.nn.Embedding(vocab_limit, embedding_dim=embedding_dim)
         self.lstm = torch.nn.LSTM(
             input_size=embedding_dim,
@@ -143,6 +147,7 @@ class MolLSTM(nn.Module):
             bidirectional=True,
             batch_first=True,
         )
+        self.metric_to_func = {metric: get_metric_func(metric) for metric in metrics}
         self.dropout = torch.nn.Dropout(p=p_dropout)
         self.attn_pool = AttentionPooling(att_polling_size)
         self.out = nn.Linear(att_polling_size, d_out)
@@ -154,3 +159,43 @@ class MolLSTM(nn.Module):
         x = self.attn_pool(x)
         x = torch.sigmoid(self.out(x))
         return x
+
+    def compute_metrics(self, y_hat, y, split_str="train"):
+        loss = F.binary_cross_entropy(y_hat, y)
+        results = {}
+        for metric, m_func in self.metric_to_func.items():
+            results[metric] =  m_func(y_hat, y)
+        results["loss"] = loss
+        return {
+            "%s_{}".format(metric) % split_str: res for metric, res in results
+        }
+
+    def training_step(self, batch, batch_idx):
+        x, y = batch
+        y_hat = self(x)
+        res_metrics = self.compute_metrics(y_hat, y, "train")
+        for key, val in res_metrics.items():
+            self.log(key, val)
+
+        return res_metrics["train_loss"]
+
+    def validation_step(self, batch, batch_idx):
+        x, y = batch
+        y_hat = self(x)
+        res_metrics = self.compute_metrics(y_hat, y, "valid")
+        for key, val in res_metrics.items():
+            self.log(key, val)
+
+        return res_metrics
+
+    def test_step(self, batch, batch_idx):
+        x, y = batch
+        y_hat = self(x)
+        res_metrics = self.compute_metrics(y_hat, y, "test")
+        for key, val in res_metrics.items():
+            self.log(key, val)
+
+        return res_metrics
+
+    def configure_optimizers(self):
+        return torch.optim.Adam(self.parameters(), lr=self.lr)
