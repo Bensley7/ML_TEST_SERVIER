@@ -8,7 +8,7 @@ from dataset.loader import MoleculeDataLoader
 from models.model import MoleculeModel
 from models.metrics import get_metric_func
 
-from .predict import predict
+from .predictor import predict
 
 def evaluate_predictions(preds: List[List[float]],
                          targets: List[List[float]],

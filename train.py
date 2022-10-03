@@ -3,14 +3,16 @@ import os
 from os import makedirs
 from tqdm import trange
 import argparse
+import warnings
+warnings.filterwarnings("ignore")
 
 import torch
 
 from torch.optim.lr_scheduler import ExponentialLR
 
 from utils.utils import get_data
-from utils.evaluate import evaluate, evaluate_predictions
-from utils.predict import predict
+from utils.evaluator import evaluate, evaluate_predictions
+from utils.predictor import predict
 from utils.trainer import batch_train
 from utils.io import load_checkpoint, save_checkpoint, read_cfg
 from models.utils import get_loss_func, build_lr_scheduler, build_optimizer

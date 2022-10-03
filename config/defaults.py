@@ -10,7 +10,7 @@ _C = CN()
 # -----------------------------------------------------------------------------
 _C.DATA_DIGEST = CN()
 _C.DATA_DIGEST.smiles_name = "smiles"
-_C.DATA_DIGEST.labels_name = ["P1"] # Default: ["P1"]
+_C.DATA_DIGEST.labels_name = ["P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8", "P9"] # Default: ["P1"]
 _C.DATA_DIGEST.val_ratio = 0.2
 _C.DATA_DIGEST.test_ratio = 0.1
 
@@ -21,7 +21,7 @@ _C.MODEL = CN()
 _C.MODEL.device = "cuda:0"
 _C.MODEL.num_workers = 8
 _C.MODEL.activation = "ReLU"
-_C.MODEL.loss_function = "binary_cross_entropy"
+_C.MODEL.loss_function = "cross_entropy"
 _C.MODEL.ffn_num_layers = 2
 _C.MODEL.ffn_hidden_size = 300
 _C.MODEL.hidden_size = 300
