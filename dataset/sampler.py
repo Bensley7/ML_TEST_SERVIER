@@ -4,14 +4,12 @@ from typing import Iterator
 import numpy as np
 from torch.utils.data import Sampler
 
-from .loader import MoleculeDataset
-
 
 class MoleculeSampler(Sampler):
     """A :class:`MoleculeSampler` samples data from a :class:`MoleculeDataset` for a :class:`MoleculeDataLoader`."""
 
     def __init__(self,
-                 dataset: MoleculeDataset,
+                 dataset,
                  class_balance: bool = False,
                  shuffle: bool = False,
                  seed: int = 0):
