@@ -118,6 +118,7 @@ M3      | f1 score  | 0.898
 #### Next
 - Better Split of data (molecules that are look alike - better knowledge in chemistry) to avoid data leakage
 - Techniques of sampling molecules - it is not like images- find rights isomorphisms for data augmenation too
+- Better statistical sampling - tried with digest.py , but still more effort in that matter especially that the dataset is imbalanced (1's are more present that 0's)
 - Transfer learning
 - Add more features to mpn_ffc graph to grasp interaction and learn a better representation of graphs
 - Fine tune models - everythong is in config - we should spend time testing
