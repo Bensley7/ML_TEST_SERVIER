@@ -29,7 +29,7 @@ In order to run the project with CUDA, please install CUDA and cudnn. You can ru
     git clone git@github.com:Bensley7/ML_TEST_SERVIER.git
     cd ML_TEST_SERVIER
     pip install -e .
-```
+    ```
 
 ### Option 2: From Docker
 
