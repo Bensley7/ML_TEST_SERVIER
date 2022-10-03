@@ -5,6 +5,7 @@ import numpy as np
 from rdkit import Chem
 import torch
 import torch.nn as nn
+from torch.nn import functional as F
 
 sys.path.append("../")
 from .utils import get_activation_function, initialize_weights
@@ -108,3 +109,48 @@ class MoleculeModel(nn.Module):
             if not self.training:
                 output = self.multiclass_softmax(output)  # to get probabilities during evaluation, but not during training when using CrossEntropyLoss
         return output
+
+
+class AttentionPooling(nn.Module):
+    def __init__(self, nb_features: int):
+        super().__init__()
+        self.in_features = nb_features
+        self.d = nn.Linear(nb_features, 1)
+
+    def forward(self, x):
+        x1 = F.softmax(self.d(x), dim=1).expand(x.size())
+        x2 = x1 * x
+        v = x2.sum(1)
+        return v
+
+
+class MolLSTM(nn.Module):
+    def __init__(
+        self,
+        d_out: int = 1,
+        vocab_limit: int = 101,
+        embedding_dim: int = 128,
+        hidden_lstm_size: int = 128,
+        p_dropout: float = 0.25,
+        att_polling_size: int = 256,
+    ) -> None:
+        super().__init__()
+
+        self.embeddings = torch.nn.Embedding(vocab_limit, embedding_dim=embedding_dim)
+        self.lstm = torch.nn.LSTM(
+            input_size=embedding_dim,
+            hidden_size=hidden_lstm_size,
+            bidirectional=True,
+            batch_first=True,
+        )
+        self.dropout = torch.nn.Dropout(p=p_dropout)
+        self.attn_pool = AttentionPooling(att_polling_size)
+        self.out = nn.Linear(att_polling_size, d_out)
+
+    def forward(self, x):
+        x = self.dropout(self.embeddings(x))
+        x, _ = self.lstm(x)
+        x = self.dropout(x)
+        x = self.attn_pool(x)
+        x = torch.sigmoid(self.out(x))
+        return x
