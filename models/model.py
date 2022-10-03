@@ -9,7 +9,7 @@ from torch.nn import functional as F
 import pytorch_lightning as pl
 
 sys.path.append("../")
-from .utils import get_activation_function, initialize_weights
+from .utils import get_activation_function, initialize_weights, get_loss_func
 from features.graph_featurization import BatchMolGraph
 from .mpn import MPN
 from .metrics import get_metric_func
@@ -135,12 +135,15 @@ class MoleculeAttentionLSTM(pl.LightningModule):
         hidden_lstm_size: int = 128,
         p_dropout: float = 0.25,
         att_polling_size: int = 256,
+        str_loss_func: str = None,
         metrics: List[str] = None,
         lr: float = 1e-4,
     ) -> None:
         super().__init__()
-        self.save_hyperparameters()
+        # Get loss function
+        self.loss_func = get_loss_func(str_loss_func)
         self.embeddings = torch.nn.Embedding(vocab_limit, embedding_dim=embedding_dim)
+        self.lr = lr
         self.lstm = torch.nn.LSTM(
             input_size=embedding_dim,
             hidden_size=hidden_lstm_size,
@@ -163,11 +166,12 @@ class MoleculeAttentionLSTM(pl.LightningModule):
     def compute_metrics(self, y_hat, y, split_str="train"):
         loss = F.binary_cross_entropy(y_hat, y)
         results = {}
+        y_hat = torch.round(y_hat)
         for metric, m_func in self.metric_to_func.items():
             results[metric] =  m_func(y_hat, y)
         results["loss"] = loss
         return {
-            "%s_{}".format(metric) % split_str: res for metric, res in results
+            "%s_{}".format(metric) % split_str: res for metric, res in results.items()
         }
 
     def training_step(self, batch, batch_idx):
@@ -175,6 +179,7 @@ class MoleculeAttentionLSTM(pl.LightningModule):
         y_hat = self(x)
         res_metrics = self.compute_metrics(y_hat, y, "train")
         for key, val in res_metrics.items():
+            print(key, val)
             self.log(key, val)
 
         return res_metrics["train_loss"]
@@ -182,10 +187,10 @@ class MoleculeAttentionLSTM(pl.LightningModule):
     def validation_step(self, batch, batch_idx):
         x, y = batch
         y_hat = self(x)
-        res_metrics = self.compute_metrics(y_hat, y, "valid")
+        res_metrics = self.compute_metrics(y_hat, y, "val")
         for key, val in res_metrics.items():
+            print(key, val)
             self.log(key, val)
-
         return res_metrics
 
     def test_step(self, batch, batch_idx):

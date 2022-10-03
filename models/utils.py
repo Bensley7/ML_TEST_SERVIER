@@ -6,7 +6,6 @@ import torch
 from torch.optim import Adam, Optimizer
 from torch.optim.lr_scheduler import _LRScheduler
 
-
 def initialize_weights(model: nn.Module) -> None:
     """
     Initializes the weights of a model in place.
@@ -81,7 +80,7 @@ def index_select_ND(source: torch.Tensor, index: torch.Tensor) -> torch.Tensor:
 
     return target
 
-def get_loss_func(loss_function: str, dataset_type: str) -> Callable:
+def get_loss_func(loss_function: str, dataset_type: str = "classification") -> Callable:
     """
     Gets the loss function corresponding to a given dataset type.
 
