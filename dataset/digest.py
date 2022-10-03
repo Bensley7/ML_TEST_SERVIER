@@ -7,7 +7,7 @@ from sklearn.model_selection import train_test_split
 from skmultilearn.model_selection import iterative_train_test_split
 
 sys.path.append("../")
-from common.io import read_cfg
+from utils.io import read_cfg
 
 class DataDigest:
     """Class to split raw molecule propeties source data into train, test and val according to CFG"""
@@ -34,11 +34,11 @@ class DataDigest:
             test_size=self.test_ratio,
             random_state=0,
         )
-        val_ratio_from_train_size = self.val_ratio / (1 - self.test_ratio)
+        val_ratio_from_train_ratio = self.val_ratio / (1 - self.test_ratio)
         train, val = train_test_split(
             train_pool,
             stratify=train_pool[self.labels_name],
-            test_size=val_ratio_from_train_size,
+            test_size=val_ratio_from_train_ratio,
             random_state=0,
         )
         return train, val, test
@@ -70,11 +70,11 @@ class MultiLabelDataDigest(DataDigest):
             np.array(data[self.labels_name]),
             test_size = self.test_ratio,
             )
-        val_ratio_from_train_size = self.val_ratio / (1 - self.test_ratio)
+        val_ratio_from_train_ratio = self.val_ratio / (1 - self.test_ratio)
         x_train, y_train, x_val, y_val = iterative_train_test_split(
             x_train_pool,
             y_train_pool,
-            test_size = val_ratio_from_train_size,
+            test_size = val_ratio_from_train_ratio,
         )
         train = self.create_data_frame(x_train, y_train)
         val = self.create_data_frame(x_val, y_val)
@@ -98,7 +98,7 @@ def main(args):
     elif len(cfg.DATA_DIGEST.labels_name) > 1:
         MultiLabelDataDigest(args.raw_data_path, cfg.DATA_DIGEST).run()
     else:
-        raise Exception("Non-valid Data Digester module - there are no labels")
+        raise Exception("Non-valid Data Diges module - there are no labels")
 
 
 if __name__ == "__main__":
