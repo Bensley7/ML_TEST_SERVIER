@@ -2,8 +2,7 @@ import math
 from typing import Callable, List, Union
 
 import torch.nn as nn
-import numpy as np
-import torch
+
 from sklearn.metrics import auc, precision_recall_curve,\
     roc_auc_score, accuracy_score, log_loss, f1_score
 

@@ -1,7 +1,6 @@
 from typing import List, Union, Tuple
 import sys
 
-import numpy as np
 from rdkit import Chem
 import torch
 import torch.nn as nn
@@ -137,7 +136,7 @@ class MoleculeAttentionLSTM(pl.LightningModule):
         p_dropout: float = 0.25,
         att_polling_size: int = 256,
         str_loss_func: str = None,
-        metrics: List[str] = None,
+        metrics: List[str] = [],
         lr: float = 1e-4,
     ) -> None:
         super().__init__()

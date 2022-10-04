@@ -39,7 +39,7 @@ def get_data_from_smile(smile: str, cfg) -> MoleculeDataset:
             ) for i, (smiles, targets) in tqdm(enumerate(zip(all_smiles, all_targets)),
                                             total=len(all_smiles))
         ])
-    return data 
+    return data
 
 
 def get_data(path: str, cfg, skip_invalid_smiles = True) -> MoleculeDataset:
@@ -74,6 +74,16 @@ def get_data(path: str, cfg, skip_invalid_smiles = True) -> MoleculeDataset:
 
     return data
 
+def get_bit_map_loader_from_smile(smile: str) -> MoleculeDataset:
+    all_smiles = [[smile]]
+    all_targets = [[0.0]]
+    molecule_bit_map_dataset = MoleculeBitMapDataset(all_smiles, all_targets)
+    
+    return DataLoader(
+        molecule_bit_map_dataset,
+        batch_size=1,
+        shuffle=False,
+        num_workers=1)
 
 def get_molecule_bit_map_loader(path: str, cfg, max_len: int = 64):
 
@@ -81,7 +91,6 @@ def get_molecule_bit_map_loader(path: str, cfg, max_len: int = 64):
     target_columns = cfg.DATA_DIGEST.labels_name
 
     all_smiles, all_targets = get_attributes(path, smiles_columns, target_columns)
-
     molecule_bit_map_dataset = MoleculeBitMapDataset(all_smiles, all_targets)
     
     return DataLoader(

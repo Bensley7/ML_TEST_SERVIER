@@ -1,6 +1,7 @@
 import argparse
 
 from predict.mpn_ffc_predict import pred as predmpn
+from predict.attention_lstm_predict import pred as predlstm
 from utils.io import read_cfg
 
 def parse_opt():
@@ -17,7 +18,9 @@ def parse_opt():
 def pred(opt):
     #Read config file
     cfg = read_cfg(opt.config_file, opt.opts)
-    if cfg.MODEL.name == "mpn_ffd":
+    if cfg.MODEL.name == "attention_lstm":
+        print(predlstm(opt))
+    elif cfg.MODEL.name == "mpn_ffd":
         print(predmpn(opt))
 
 if __name__ == "__main__":

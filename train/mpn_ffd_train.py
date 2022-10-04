@@ -29,7 +29,7 @@ def train_model(
     config_file,
     opts,
     model_dir="mpn_ffd/",
-    model_name="mpn_ffd1.pt",
+    model_name="mpn_ffd1",
 ) -> None:
 
     #Read config file
@@ -141,11 +141,11 @@ def train_model(
         mean_val_score = np.mean(val_scores[cfg.MODEL.TRAINING.metric], axis=None)
         if  mean_val_score > best_score:
             best_score, best_epoch = mean_val_score, epoch
-            save_checkpoint(os.path.join(model_dir, model_name), model)
+            save_checkpoint(os.path.join(model_dir, model_name + ".pt"), model)
 
     # Evaluate on test set using model with best validation score
     print(f'Model best validation {cfg.MODEL.TRAINING.metric} = {best_score:.6f} on epoch {best_epoch}')
-    model = load_checkpoint(os.path.join(model_dir, model_name), cfg, device=device)
+    model = load_checkpoint(os.path.join(model_dir, model_name + ".pt"), cfg, device=device)
 
     test_preds = predict(
         model=model,
@@ -175,7 +175,7 @@ def parse_opt():
     parser.add_argument("opts", help="Modify config options using the command-line", default=None,
                         nargs=argparse.REMAINDER)
     parser.add_argument('--model_dir', type=str, default="mol_models/", help='directory to save the model')
-    parser.add_argument('--model_name', type=str, default = "model1.pt", help='pytorch model name')
+    parser.add_argument('--model_name', type=str, default = "model1", help='pytorch model name')
 
     args = parser.parse_args()
     return args

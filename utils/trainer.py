@@ -1,4 +1,3 @@
-from bdb import set_trace
 from tqdm import tqdm
 from typing import Callable
 import sys

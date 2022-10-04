@@ -1,11 +1,9 @@
-from cProfile import label
 from typing import List
 import sys
 import argparse
 
 import torch
 from tqdm import tqdm
-import numpy as np
 
 sys.path.append("../")
 from dataset.loader import MoleculeDataLoader, MoleculeDataset
@@ -90,7 +88,6 @@ def predict_single(model_path: str, smile: str, config_file: str, opts):
         res = {cfg.DATA_DIGEST.labels_name[0]: (out[0][0] > 0.5) * 1}
 
     return res
-
 
 
 def parse_opt():

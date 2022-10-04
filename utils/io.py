@@ -105,3 +105,12 @@ def load_checkpoint(
     model = model.to(device)
 
     return model
+
+def load_model(model, model_path):
+    if torch.cuda.is_available():
+        model.load_state_dict(torch.load(model_path)["state_dict"])
+    else:
+        model.load_state_dict(
+            torch.load(model_path, map_location=torch.device("cpu"))["state_dict"]
+        )
+    return model

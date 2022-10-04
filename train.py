@@ -14,7 +14,7 @@ def parse_opt():
     parser.add_argument("opts", help="Modify config options using the command-line", default=None,
                         nargs=argparse.REMAINDER)
     parser.add_argument('--model_dir', type=str, default="mol_models/", help='directory to save the model')
-    parser.add_argument('--model_name', type=str, default = "model1.pt", help='pytorch model name')
+    parser.add_argument('--model_name', type=str, default = "model1", help='pytorch model name')
 
     args = parser.parse_args()
     return args

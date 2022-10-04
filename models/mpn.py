@@ -2,7 +2,6 @@ from typing import List, Union, Tuple
 from functools import reduce
 import sys
 
-import numpy as np
 from rdkit import Chem
 import torch
 import torch.nn as nn
