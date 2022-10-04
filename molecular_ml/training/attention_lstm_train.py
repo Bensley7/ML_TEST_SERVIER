@@ -2,6 +2,7 @@ import argparse
 import sys
 from os import makedirs
 
+import torch
 from pytorch_lightning.callbacks import ModelCheckpoint
 import pytorch_lightning as pl
 
@@ -34,7 +35,7 @@ def train_model(
     test_loader = get_molecule_bit_map_loader(test_data_path, cfg)
 
     device = 'cpu'
-    if 'cuda' in cfg.MODEL.device:
+    if 'cuda' in cfg.MODEL.device and torch.cuda.is_available():
         device = 'gpu'
 
     checkpoint_callback = ModelCheckpoint(
