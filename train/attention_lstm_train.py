@@ -1,15 +1,9 @@
 import argparse
-from ast import arg
 import sys
-import os
 from os import makedirs
 
-from torch import cpu, device
-
-import pytorch_lightning as pl
 from pytorch_lightning.callbacks import ModelCheckpoint
-from pytorch_lightning.callbacks.early_stopping import EarlyStopping
-from pytorch_lightning.loggers import TensorBoardLogger
+import pytorch_lightning as pl
 
 sys.path.append("../")
 from utils.io import read_cfg
@@ -24,7 +18,7 @@ def train_model(
     config_file,
     opts,
     model_dir="./attention_lstm/",
-    model_name="attention_lstm1.pt"
+    model_name="attention_lstm1"
     ):
     #Read config file
     cfg = read_cfg(config_file, opts)
@@ -41,14 +35,20 @@ def train_model(
     )
     test_loader = get_molecule_bit_map_loader(test_data_path, cfg)
 
-    makedirs(model_dir)
-
     device = 'cpu'
     if 'cuda' in cfg.MODEL.device:
         device = 'gpu'
+
+    checkpoint_callback = ModelCheckpoint(
+        dirpath=model_dir,
+        filename=model_name,
+        save_top_k=1,
+    )
+
     trainer = pl.Trainer(
         max_epochs=cfg.MODEL.TRAINING.nb_epochs,
         logger=None,
+        callbacks=[checkpoint_callback],
         accelerator=device,
         enable_progress_bar=True,
     )
@@ -59,7 +59,6 @@ def train_model(
                                  )
 
     trainer.fit(model, train_loader, val_loader)
-    trainer.save_checkpoint(os.path.join(model_dir, model_name))
     trainer.validate(model, dataloaders=val_loader)
     trainer.test(model, dataloaders=test_loader)
 
@@ -74,7 +73,7 @@ def parse_opt():
     parser.add_argument("opts", help="Modify config options using the command-line", default=None,
                         nargs=argparse.REMAINDER)
     parser.add_argument('--model_dir', type=str, default="mol_models/", help='directory to save the model')
-    parser.add_argument('--model_name', type=str, default = "model1.pt", help='pytorch model name')
+    parser.add_argument('--model_name', type=str, default = "model1", help='pytorch model name')
 
     args = parser.parse_args()
     return args
