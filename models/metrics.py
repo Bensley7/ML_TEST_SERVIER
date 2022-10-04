@@ -2,6 +2,8 @@ import math
 from typing import Callable, List, Union
 
 import torch.nn as nn
+import numpy as np
+import torch
 from sklearn.metrics import auc, precision_recall_curve,\
     roc_auc_score, accuracy_score, log_loss, f1_score
 
@@ -83,7 +85,6 @@ def accuracy(targets: List[int], preds: Union[List[float], List[List[float]]], t
         hard_preds = [p.index(max(p)) for p in preds]
     else:
         hard_preds = [1 if p > threshold else 0 for p in preds]  # binary prediction
-
     return accuracy_score(targets, hard_preds)
 
 

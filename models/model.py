@@ -14,6 +14,7 @@ from features.graph_featurization import BatchMolGraph
 from .mpn import MPN
 from .metrics import get_metric_func
 
+
 class MoleculeModel(nn.Module):
     """A :class:`MoleculeModel` is a model which contains a message passing network following by feed-forward layers."""
 
@@ -162,13 +163,14 @@ class MoleculeAttentionLSTM(pl.LightningModule):
         x = self.attn_pool(x)
         x = torch.sigmoid(self.out(x))
         return x
-
+        
     def compute_metrics(self, y_hat, y, split_str="train"):
         loss = F.binary_cross_entropy(y_hat, y)
         results = {}
-        y_hat = torch.round(y_hat)
+        y_np = y.cpu().detach().numpy().ravel().tolist()
+        y_hat_np = y_hat.cpu().detach().numpy().ravel().tolist()
         for metric, m_func in self.metric_to_func.items():
-            results[metric] =  m_func(y_hat, y)
+            results[metric] =  m_func(y_np, y_hat_np)
         results["loss"] = loss
         return {
             "%s_{}".format(metric) % split_str: res for metric, res in results.items()
@@ -181,7 +183,6 @@ class MoleculeAttentionLSTM(pl.LightningModule):
         for key, val in res_metrics.items():
             print(key, val)
             self.log(key, val)
-
         return res_metrics["train_loss"]
 
     def validation_step(self, batch, batch_idx):
@@ -200,7 +201,6 @@ class MoleculeAttentionLSTM(pl.LightningModule):
         for key, val in res_metrics.items():
             self.log(key, val)
 
-        return res_metrics
 
     def configure_optimizers(self):
         return torch.optim.Adam(self.parameters(), lr=self.lr)

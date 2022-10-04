@@ -1,6 +1,10 @@
 import argparse
 from ast import arg
 import sys
+import os
+from os import makedirs
+
+from torch import cpu, device
 
 import pytorch_lightning as pl
 from pytorch_lightning.callbacks import ModelCheckpoint
@@ -19,10 +23,9 @@ def train_model(
     test_data_path,
     config_file,
     opts,
-    model_dir="attention_lstm/",
-    model_name="attention_lstm1.pt",
-    logs_path="logs/",
-):
+    model_dir="./attention_lstm/",
+    model_name="attention_lstm1.pt"
+    ):
     #Read config file
     cfg = read_cfg(config_file, opts)
     #Get data
@@ -38,24 +41,15 @@ def train_model(
     )
     test_loader = get_molecule_bit_map_loader(test_data_path, cfg)
 
-    logger = TensorBoardLogger(save_dir=logs_path)
+    makedirs(model_dir)
 
-    checkpoint_callback = ModelCheckpoint(
-        monitor="val_loss",
-        mode="min",
-        dirpath=model_dir,
-        filename=model_name,
-        save_top_k=1,
-    )
-    early_stopping = EarlyStopping(
-        monitor="val_loss", mode="min", patience=3, verbose=True
-    )
-
+    device = 'cpu'
+    if 'cuda' in cfg.MODEL.device:
+        device = 'gpu'
     trainer = pl.Trainer(
         max_epochs=cfg.MODEL.TRAINING.nb_epochs,
-        logger=logger,
-        callbacks=[checkpoint_callback, early_stopping],
-        accelerator="cpu",
+        logger=None,
+        accelerator=device,
         enable_progress_bar=True,
     )
 
@@ -65,7 +59,7 @@ def train_model(
                                  )
 
     trainer.fit(model, train_loader, val_loader)
-
+    trainer.save_checkpoint(os.path.join(model_dir, model_name))
     trainer.validate(model, dataloaders=val_loader)
     trainer.test(model, dataloaders=test_loader)
 

@@ -92,7 +92,6 @@ You can change loss fucntions and hyperparameters in the config file. Accepted o
 servier evaluate --model_path ./models/model_name.pt --val_data_path ./data/dataset_single_test.csv
 ```
 - As for training you add the configs depending on the exercice
-- I can add a factory to switch between models.. For the lack of time I dind'nt.
 
 #### prediction
 ```
@@ -106,9 +105,9 @@ servier predict  --model_path ./models/model_name.pt --smile 'NC(=O)NC(Cc1ccccc1
 
 Method  | metric  | score
 ------------- |------------- | -------------
-M1      | accuracy  | 0.802
-M1      | f1 score  | 0.45
-M1      | ROC CURVE  | 0.62
+M1      | accuracy  | 0.822
+M1      | f1 score  | 0.90
+M1      | ROC CURVE  | 0.83
 M2      | accuracy  | 0.83
 M2      | f1 score  | 0.93
 M2      | ROC CURVE  | 0.9
