@@ -1,7 +1,7 @@
 import argparse
 
-from eval.mpn_ffd_eval import eval as evalmpn
-from eval.attention_lstm_eval import eval as evallstm
+from evaluate.mpn_ffd_eval import eval as evalmpn
+from evaluate.attention_lstm_eval import eval as evallstm
 from utils.io import read_cfg
 
 def parse_opt():

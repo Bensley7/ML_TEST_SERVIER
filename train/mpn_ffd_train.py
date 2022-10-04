@@ -17,7 +17,7 @@ from utils.utils import evaluate_predictions
 from predict.mpn_ffc_predict import predict
 from utils.trainer import batch_train
 from utils.io import load_checkpoint, save_checkpoint, read_cfg
-from eval.mpn_ffd_eval import evaluate
+from evaluate.mpn_ffd_eval import evaluate
 from models.utils import get_loss_func, build_lr_scheduler, build_optimizer
 from models.model import MoleculeModel
 from dataset.loader import MoleculeDataLoader

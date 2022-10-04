@@ -89,13 +89,13 @@ You can change loss fucntions and hyperparameters in the config file. Accepted o
 
 #### Evaluation
 ```
-servier evaluate --model_path ./models/model_name.pt --val_data_path ./data/dataset_single_test.csv
+servier evaluate --model_path ./trained_models/model_name.pt --val_data_path ./data/dataset_single_test.csv
 ```
 - As for training you add the configs depending on the exercice
 
 #### prediction
 ```
-servier predict  --model_path ./models/model_name.pt --smile 'NC(=O)NC(Cc1ccccc1)C(=O)O'
+servier predict  --model_path ./trained_models/model_name.pt --smile 'NC(=O)NC(Cc1ccccc1)C(=O)O'
 ```
 
 #### Result
