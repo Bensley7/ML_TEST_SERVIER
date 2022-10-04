@@ -39,9 +39,6 @@ In order to run the project with CUDA, please install CUDA and cudnn. You can ru
 4. `docker build -t servier .`
 5. `docker run -it servier:latest`
 
-## Flask
-
-Run `python smile_flask.py` if installed from source) and then navigate to [localhost:5000](http://localhost:5000) in a web browser.
 
 ## Run Project
 
@@ -98,7 +95,14 @@ servier evaluate --model_path ./trained_models/model_name.pt --val_data_path ./d
 servier predict  --model_path ./trained_models/model_name.pt --smile 'NC(=O)NC(Cc1ccccc1)C(=O)O'
 ```
 
-#### Result
+## Flask
+
+Run `python molecular_ml/web/server.py  path_to_your_desired_model --config_file path_of_your_desired_config_file` 
+
+There are options about host and port too in the server arguments .
+
+## Result
+
 - ATTENTION_LSTM - basic features : M1
 - MPN_FFC_SINGLE : M2
 - MPN_FFC_multi : M3
