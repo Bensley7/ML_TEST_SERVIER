@@ -5,11 +5,8 @@ from collections import defaultdict
 
 from torch.utils.data import DataLoader
 
-import sys
-sys.path.append("..")
-
-from dataset.loader import MoleculeDataset, MoleculeDatapoint, MoleculeBitMapDataset
-from models.metrics import get_metric_func
+from molecular_ml.dataset.loader import MoleculeDataset, MoleculeDatapoint, MoleculeBitMapDataset
+from molecular_ml.models.metrics import get_metric_func
 
 def get_attributes(path: str, smiles_columns, target_columns):
     # Load data

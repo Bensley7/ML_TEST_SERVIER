@@ -1,12 +1,11 @@
 import sys, os
 import logging
-from config import cfg
+from molecular_ml.config import cfg
 import sys
 
 import torch
 
-sys.path.append("../")
-from models.model import MoleculeModel
+from molecular_ml.models.model import MoleculeModel
 
 def setup_logger(name, save_dir, distributed_rank):
     logger = logging.getLogger(name)
@@ -27,11 +26,10 @@ def setup_logger(name, save_dir, distributed_rank):
         logger.addHandler(fh)
     return logger
 
-def read_cfg(config_file, opts):
+def read_cfg(config_file):
     logger = setup_logger("Setup cfg", "/tmp", 0)
     if config_file != "":
         cfg.merge_from_file(config_file)
-    cfg.merge_from_list(opts)
     cfg.freeze()
     if config_file != "":
         logger.info("Loaded configuration file {}".format(config_file))

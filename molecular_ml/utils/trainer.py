@@ -1,16 +1,14 @@
 from tqdm import tqdm
 from typing import Callable
-import sys
 
 import torch
-from torch.optim import Adam, Optimizer
+from torch.optim import Optimizer
 from torch.optim.lr_scheduler import _LRScheduler
 
-sys.path.append("../")
-from dataset.loader import MoleculeDataset, MoleculeDataLoader
-from models.model import MoleculeModel
-from models.utils import NoamLR
-from models.metrics import compute_gnorm, compute_pnorm
+from molecular_ml.dataset.loader import MoleculeDataset, MoleculeDataLoader
+from molecular_ml.models.model import MoleculeModel
+from molecular_ml.models.utils import NoamLR
+from molecular_ml.models.metrics import compute_gnorm, compute_pnorm
 
 def batch_train(model: MoleculeModel,
           data_loader: MoleculeDataLoader,

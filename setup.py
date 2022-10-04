@@ -1,4 +1,5 @@
 import os
+from importlib_metadata import entry_points
 
 from setuptools import setup
 
@@ -16,7 +17,7 @@ except:
 
 
 setup(
-    name="ML_TEST_SERVIER",
+    name="molecular_ml",
     version="0.0.1",
     author="Mohammed Benslimane",
     author_email="mde.benslimane@gmail.com",
@@ -25,8 +26,8 @@ setup(
     install_requires=REQUIRED,
     keywords="Smile",
     url="https://github.com/Bensley7/ML_TEST_SERVIER.git",
-    packages=["ML_TEST_SERVIER"],
-    entry_points={"console_scripts": ["servier=ML_TEST_SERVIER.main:cli"]},
+    packages=["molecular_ml"],
+    entry_points={"console_scripts": ["servier=molecular_ml.main:run"]},
     classifiers=[
         "License :: MIT",
     ],

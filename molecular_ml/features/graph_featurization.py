@@ -4,8 +4,8 @@ from itertools import zip_longest
 from rdkit import Chem
 import torch
 
-from .feature_extractor import make_mole
-from .utils import atom_features, bond_features, get_bond_fdim, get_atom_fdim
+from molecular_ml.features.feature_extractor import make_mole
+from molecular_ml.features.utils import atom_features, bond_features, get_bond_fdim, get_atom_fdim
 
 
 class MolGraph:

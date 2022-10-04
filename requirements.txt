@@ -6,6 +6,5 @@ scikit-multilearn
 tqdm
 PyYAML>=5.3.1
 yacs==0.1.8
-logging
 typing
 Flask

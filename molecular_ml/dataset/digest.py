@@ -6,8 +6,7 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 from skmultilearn.model_selection import iterative_train_test_split
 
-sys.path.append("../")
-from utils.io import read_cfg
+from molecular_ml.utils.io import read_cfg
 
 class DataDigest:
     """Class to split raw molecule propeties source data into train, test and val according to CFG"""

@@ -6,10 +6,9 @@ from rdkit import Chem
 import torch
 import torch.nn as nn
 
-sys.path.append("../")
-from .utils import get_activation_function, index_select_ND
-from features.graph_featurization import BatchMolGraph, mol2graph
-from features.utils import get_atom_fdim, get_bond_fdim
+from molecular_ml.models.utils import get_activation_function, index_select_ND
+from molecular_ml.features.graph_featurization import BatchMolGraph, mol2graph
+from molecular_ml.features.utils import get_atom_fdim, get_bond_fdim
 
 class MPNEncoder(nn.Module):
     """An :class:`MPNEncoder` is a message passing neural network for encoding a molecule."""

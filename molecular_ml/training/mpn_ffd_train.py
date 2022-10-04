@@ -11,29 +11,27 @@ import torch
 
 from torch.optim.lr_scheduler import ExponentialLR
 
-sys.path.append("../")
-from utils.utils import get_data
-from utils.utils import evaluate_predictions
-from predict.mpn_ffc_predict import predict
-from utils.trainer import batch_train
-from utils.io import load_checkpoint, save_checkpoint, read_cfg
-from evaluate.mpn_ffd_eval import evaluate
-from models.utils import get_loss_func, build_lr_scheduler, build_optimizer
-from models.model import MoleculeModel
-from dataset.loader import MoleculeDataLoader
+from molecular_ml.utils.utils import get_data
+from molecular_ml.utils.utils import evaluate_predictions
+from molecular_ml.prediction.mpn_ffc_predict import predict
+from molecular_ml.utils.trainer import batch_train
+from molecular_ml.utils.io import load_checkpoint, save_checkpoint, read_cfg
+from molecular_ml.evaluation.mpn_ffd_eval import evaluate
+from molecular_ml.models.utils import get_loss_func, build_lr_scheduler, build_optimizer
+from molecular_ml.models.model import MoleculeModel
+from molecular_ml.dataset.loader import MoleculeDataLoader
 
 def train_model(
     train_data_path,
     val_data_path,
     test_data_path,
     config_file,
-    opts,
     model_dir="mpn_ffd/",
     model_name="mpn_ffd1",
 ) -> None:
 
     #Read config file
-    cfg = read_cfg(config_file, opts)
+    cfg = read_cfg(config_file)
     #Get data
     print('Loading data')
     train_data = get_data(
@@ -172,8 +170,6 @@ def parse_opt():
     parser.add_argument("--test_data_path", help="test dataset path", type=str)
 
     parser.add_argument("--config_file", default="", help="path to config file", type=str)
-    parser.add_argument("opts", help="Modify config options using the command-line", default=None,
-                        nargs=argparse.REMAINDER)
     parser.add_argument('--model_dir', type=str, default="mol_models/", help='directory to save the model')
     parser.add_argument('--model_name', type=str, default = "model1", help='pytorch model name')
 

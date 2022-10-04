@@ -5,13 +5,12 @@ import argparse
 import torch
 import numpy as np
 
-sys.path.append("../")
-from dataset.loader import MoleculeDataLoader
-from models.model import MoleculeModel
-from predict.mpn_ffc_predict import predict
-from utils.utils import evaluate_predictions
-from utils.io import load_checkpoint, read_cfg
-from utils.utils import get_data
+from molecular_ml.dataset.loader import MoleculeDataLoader
+from molecular_ml.models.model import MoleculeModel
+from molecular_ml.prediction.mpn_ffc_predict import predict
+from molecular_ml.utils.utils import evaluate_predictions
+from molecular_ml.utils.io import load_checkpoint, read_cfg
+from molecular_ml.utils.utils import get_data
 
 def evaluate(model: MoleculeModel,
              data_loader: MoleculeDataLoader,
@@ -42,10 +41,10 @@ def evaluate(model: MoleculeModel,
     return results
 
 
-def eval_model(model_path, val_data_path, config_file, opts):
+def eval_model(model_path, val_data_path, config_file):
     
     #Read config file
-    cfg = read_cfg(config_file, opts)
+    cfg = read_cfg(config_file)
     
     print('Loading data')
     val_data = get_data(
@@ -89,16 +88,13 @@ def parse_opt():
     parser.add_argument('--model_path', type=str, required = True, help='weight path of the model')
     parser.add_argument("--val_data_path", help="dataset path with labels", type=str, required = True)
     parser.add_argument("--config_file", default="", help="path to config file", type=str)
-    parser.add_argument("opts", help="Modify config options using the command-line", default=None,
-                        nargs=argparse.REMAINDER)
 
     args = parser.parse_args()
     return args
 
 
-def eval(opt):
-    eval_model(**vars(opt))
-
 if __name__ == "__main__":
     args = parse_opt()
-    eval(args)
+    eval_model(args.model_path,
+               args.val_data_path,
+               args.config_file)

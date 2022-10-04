@@ -10,10 +10,9 @@ from torch.utils.data import DataLoader, Dataset
 from rdkit import Chem
 import pandas as pd
 
-from .sampler import MoleculeSampler
-sys.path.append("../")
-from features.feature_extractor import make_mole, fingerprint_features
-from features.graph_featurization import BatchMolGraph, MolGraph
+from molecular_ml.dataset.sampler import MoleculeSampler
+from molecular_ml.features.feature_extractor import make_mole, fingerprint_features
+from molecular_ml.features.graph_featurization import BatchMolGraph, MolGraph
 
 
 class MoleculeDatapoint:

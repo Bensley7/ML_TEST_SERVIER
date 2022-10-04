@@ -4,15 +4,14 @@ import argparse
 
 import torch
 
-sys.path.append("../")
-from utils.utils import get_bit_map_loader_from_smile
-from utils.io import read_cfg, load_model
-from models.model import MoleculeAttentionLSTM
+from molecular_ml.utils.utils import get_bit_map_loader_from_smile
+from molecular_ml.utils.io import read_cfg, load_model
+from molecular_ml.models.model import MoleculeAttentionLSTM
 
 
-def predict_single(model_path: str, smile: str, config_file: str, opts):
+def predict_single(model_path: str, smile: str, config_file: str=""):
     #Read config file
-    cfg = read_cfg(config_file, opts)
+    cfg = read_cfg(config_file)
     
     print('Loading data')
     pred_loader = get_bit_map_loader_from_smile(smile)
@@ -35,20 +34,15 @@ def predict_single(model_path: str, smile: str, config_file: str, opts):
 
 def parse_opt():
     parser = argparse.ArgumentParser(description=".")
-    parser.add_argument('--model_path', type=str, required = True, help='weight path of the model')
-    parser.add_argument("--smile", help="smile of a molecule", type=str, required = True)
+    parser.add_argument('--model_path', type=str, help='weight path of the model')
+    parser.add_argument("--smile", help="smile of a molecule", type=str)
     parser.add_argument("--config_file", default="", help="path to config file", type=str)
-    parser.add_argument("opts", help="Modify config options using the command-line", default=None,
-                        nargs=argparse.REMAINDER)
 
     args = parser.parse_args()
     return args
 
 
-def pred(opt):
-    return predict_single(**vars(opt))
-
 if __name__ == "__main__":
     args = parse_opt()
-    eval(args)
+    predict_single(args.model_path, args.smile, args.config_file)
 

@@ -5,10 +5,9 @@ from os import makedirs
 from pytorch_lightning.callbacks import ModelCheckpoint
 import pytorch_lightning as pl
 
-sys.path.append("../")
-from utils.io import read_cfg
-from models.model import MoleculeAttentionLSTM
-from utils.utils import get_molecule_bit_map_loader
+from molecular_ml.utils.io import read_cfg
+from molecular_ml.models.model import MoleculeAttentionLSTM
+from molecular_ml.utils.utils import get_molecule_bit_map_loader
 
 
 def train_model(
@@ -16,12 +15,11 @@ def train_model(
     val_data_path,
     test_data_path,
     config_file,
-    opts,
     model_dir="./attention_lstm/",
     model_name="attention_lstm1"
     ):
     #Read config file
-    cfg = read_cfg(config_file, opts)
+    cfg = read_cfg(config_file)
     #Get data
     print('Loading data')
 
@@ -70,8 +68,6 @@ def parse_opt():
     parser.add_argument("--test_data_path", help="test dataset path", type=str)
 
     parser.add_argument("--config_file", default="", help="path to config file", type=str)
-    parser.add_argument("opts", help="Modify config options using the command-line", default=None,
-                        nargs=argparse.REMAINDER)
     parser.add_argument('--model_dir', type=str, default="mol_models/", help='directory to save the model')
     parser.add_argument('--model_name', type=str, default = "model1", help='pytorch model name')
 

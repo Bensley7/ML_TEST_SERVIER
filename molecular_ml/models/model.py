@@ -7,11 +7,10 @@ import torch.nn as nn
 from torch.nn import functional as F
 import pytorch_lightning as pl
 
-sys.path.append("../")
-from .utils import get_activation_function, initialize_weights, get_loss_func
-from features.graph_featurization import BatchMolGraph
-from .mpn import MPN
-from .metrics import get_metric_func
+from molecular_ml.models.utils import get_activation_function, initialize_weights, get_loss_func
+from molecular_ml.features.graph_featurization import BatchMolGraph
+from molecular_ml.models.mpn import MPN
+from molecular_ml.models.metrics import get_metric_func
 
 
 class MoleculeModel(nn.Module):

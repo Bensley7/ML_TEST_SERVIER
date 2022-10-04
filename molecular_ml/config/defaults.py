@@ -1,7 +1,5 @@
 from yacs.config import CfgNode as CN
 from pathlib import Path
-FILE = Path(__file__).resolve()
-ROOT = FILE.parents[0].parents[0]
 
 _C = CN()
 

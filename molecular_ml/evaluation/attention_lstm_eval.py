@@ -2,18 +2,16 @@ from typing import Dict, List
 import sys
 import argparse
 
-import torch
 import pytorch_lightning as pl
 
-sys.path.append("../")
-from utils.io import read_cfg, load_model
-from utils.utils import get_molecule_bit_map_loader
-from models.model import MoleculeAttentionLSTM
+from molecular_ml.utils.io import read_cfg, load_model
+from molecular_ml.utils.utils import get_molecule_bit_map_loader
+from molecular_ml.models.model import MoleculeAttentionLSTM
 
-def eval_model(model_path: str, val_data_path: str, config_file, opts):
+def eval_model(model_path: str, val_data_path: str, config_file):
     
     #Read config file
-    cfg = read_cfg(config_file, opts)
+    cfg = read_cfg(config_file)
     
     print('Loading data')
     val_data_loader = get_molecule_bit_map_loader(
@@ -40,8 +38,6 @@ def parse_opt():
     parser.add_argument('--model_path', type=str, required = True, help='weight path of the model')
     parser.add_argument("--val_data_path", help="dataset path with labels", type=str, required = True)
     parser.add_argument("--config_file", default="", help="path to config file", type=str)
-    parser.add_argument("opts", help="Modify config options using the command-line", default=None,
-                        nargs=argparse.REMAINDER)
 
     args = parser.parse_args()
     return args
@@ -52,4 +48,6 @@ def eval(opt):
 
 if __name__ == "__main__":
     args = parse_opt()
-    eval(args)
+    eval_model(args.model_path,
+               args.val_data_path,
+               args.config_file)
