@@ -1,6 +1,7 @@
 import argparse
 
 from eval.mpn_ffd_eval import eval as evalmpn
+from eval.attention_lstm_eval import eval as evallstm
 from utils.io import read_cfg
 
 def parse_opt():
@@ -17,7 +18,9 @@ def parse_opt():
 def eval(opt):
     #Read config file
     cfg = read_cfg(opt.config_file, opt.opts)
-    if cfg.MODEL.name == "mpn_ffd":
+    if cfg.MODEL.name == "attention_lstm":
+        evallstm(opt)
+    elif cfg.MODEL.name == "mpn_ffd":
         evalmpn(opt)
 
 if __name__ == "__main__":

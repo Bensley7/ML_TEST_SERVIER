@@ -1,10 +1,8 @@
 from typing import List, Tuple, Union
 from itertools import zip_longest
-import logging
 
 from rdkit import Chem
 import torch
-import numpy as np
 
 from .feature_extractor import make_mole
 from .utils import atom_features, bond_features, get_bond_fdim, get_atom_fdim
