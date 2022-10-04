@@ -31,6 +31,19 @@ def predict_single(model_path: str, smile: str, config_file: str=""):
     
     return {cfg.DATA_DIGEST.labels_name[0]: (out[0][0].item() > 0.5) * 1}
 
+def predict_singe_from_model(model, smile: str, label_names):
+    """
+    Predict properties with model loaded in memory
+    """
+    pred_loader = get_bit_map_loader_from_smile(smile)
+    x = None
+    for data, _ in pred_loader:
+        x = data
+
+    out = model(x)
+    
+    return {label_names[0]: (out[0][0].item() > 0.5) * 1}
+
 
 def parse_opt():
     parser = argparse.ArgumentParser(description=".")

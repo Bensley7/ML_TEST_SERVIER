@@ -26,7 +26,7 @@ def get_attributes(path: str, smiles_columns, target_columns):
     return all_smiles, all_targets
 
 
-def get_data_from_smile(smile: str, cfg) -> MoleculeDataset:
+def get_data_from_smile(smile: str) -> MoleculeDataset:
     all_smiles = [[smile]]
     all_targets = [[0.0]]
     data = MoleculeDataset([

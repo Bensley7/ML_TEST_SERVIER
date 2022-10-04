@@ -59,7 +59,7 @@ def predict_single(model_path: str, smile: str, config_file: str=""):
     cfg = read_cfg(config_file)
     
     print('Loading data')
-    pred_data = get_data_from_smile(smile, cfg)
+    pred_data = get_data_from_smile(smile)
     
     pred_data.reset()
 
@@ -86,6 +86,31 @@ def predict_single(model_path: str, smile: str, config_file: str=""):
     else:
         res = {cfg.DATA_DIGEST.labels_name[0]: (out[0][0] > 0.5) * 1}
 
+    return res
+
+
+def predict_singe_from_model(model, smile: str, label_names):
+    """
+    Predict properties with model loaded in memory
+    """
+    pred_data = get_data_from_smile(smile)
+    pred_data.reset()
+
+    pred_data_loader = MoleculeDataLoader(
+        dataset=pred_data,
+        batch_size=1,
+        num_workers=1,
+    )
+
+    out = predict(model, pred_data_loader)
+    
+    res = None
+    if isinstance(out[0][0], list):
+        res = {label_name: (prob > 0.5) * 1 for label_name, prob 
+                            in zip(label_names, out[0][0])}
+    else:
+        res = {label_names[0]: (out[0][0] > 0.5) * 1}
+    
     return res
 
 
