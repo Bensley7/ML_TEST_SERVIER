@@ -1,6 +1,5 @@
 FROM python:3.7
 
-RUN apt-get update
 RUN /usr/local/bin/python -m pip install --upgrade pip
 
 COPY requirements.txt /opt/app/requirements.txt

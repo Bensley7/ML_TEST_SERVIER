@@ -37,7 +37,7 @@ In order to run the project with CUDA, please install CUDA and cudnn. You can ru
 2. `cd ML_TEST_SERVIER`
 3. Install Docker from [https://docs.docker.com/install/](https://docs.docker.com/install/)
 4. `docker build -t servier .`
-5. `docker run -it servier:latest`
+5. `docker run -it servier:latest bash`
 
 
 ## Run Project
