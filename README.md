@@ -98,7 +98,7 @@ servier predict  --model_path ./trained_models/model_name.pt --smile 'NC(=O)NC(C
 
 ## Flask
 
-Run `python molecular_ml/web/server.py  path_to_your_desired_model --config_file path_of_your_desired_config_file` 
+Run `servier web  --model_path path_to_your_desired_model --config_file path_of_your_desired_config_file` 
 
 There are options about host and port too in the server arguments .
 

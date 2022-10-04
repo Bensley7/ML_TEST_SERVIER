@@ -3,6 +3,8 @@ import click
 from molecular_ml.train import train_model
 from molecular_ml.evaluate import evaluate_model
 from molecular_ml.predict import predict_model
+from molecular_ml.web.server import run_app
+
 
 @click.command()
 @click.option(
@@ -103,6 +105,40 @@ def evaluate(model_path: str, val_data_path: str, config_file=str):
     evaluate_model(model_path, val_data_path, config_file=config_file)
 
 
+@click.command()
+@click.option(
+    "--model_path",
+    required=True,
+    help="weight path of the model",
+    type=click.Path(exists=True, dir_okay=False, readable=True),
+)
+@click.option(
+    "--config_file",
+    default="",
+    help="path to config file",
+    type=str,
+)
+@click.option(
+    "--host",
+    default='0.0.0.0',
+    help="host name",
+    type=str,
+)
+@click.option(
+    "--port",
+    default=8000,
+    help="port name",
+    type=int,
+)
+
+def web(model_path: str, config_file: str, host: str, port: int):
+    run_app(model_path,
+            config_file=config_file,
+            host=host,
+            port=port
+            )
+
+
 @click.group()
 def run():
     pass
@@ -111,3 +147,4 @@ def run():
 run.add_command(train)
 run.add_command(evaluate)
 run.add_command(predict)
+run.add_command(web)

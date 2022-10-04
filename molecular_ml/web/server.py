@@ -48,6 +48,36 @@ def bad_request(error=None):
 
 	return resp
 
+def run_app(model_path: str,
+            config_file: str="",
+            host: str='0.0.0.0',
+            port: int=8000
+            ):
+    #Read config file
+    cfg = read_cfg(config_file)
+    
+    global model, model_name, label_names
+
+    model_name = cfg.MODEL.name
+    label_names = cfg.DATA_DIGEST.labels_name
+
+    # Check type of device
+    if "cuda" in cfg.MODEL.device:
+        print('Moving model to cuda')
+    device = torch.device(cfg.MODEL.device)
+
+    # Load model
+    model = None
+    if cfg.MODEL.name == "attention_lstm":
+        model = MoleculeAttentionLSTM()
+        model = load_model(model, model_path)
+    elif cfg.MODEL.name == "mpn_ffd":
+        model = load_checkpoint(model_path, cfg, device=device)
+    model.eval()
+
+    # Run app
+    app.run(host=host, port=port)   
+
 def parse_opt():
     parser = argparse.ArgumentParser(description=".")
     parser.add_argument('model_path', type=str, help='weight path of the model')
@@ -62,25 +92,4 @@ def parse_opt():
 if __name__ == '__main__':
     # Parse options
     args = parse_opt()
-
-    #Read config file
-    cfg = read_cfg(args.config_file)
-    model_name = cfg.MODEL.name
-    label_names = cfg.DATA_DIGEST.labels_name
-
-    # Check type of device
-    if "cuda" in cfg.MODEL.device:
-        print('Moving model to cuda')
-    device = torch.device(cfg.MODEL.device)
-
-    # Load model
-    model = None
-    if cfg.MODEL.name == "attention_lstm":
-        model = MoleculeAttentionLSTM()
-        model = load_model(model, args.model_path)
-    elif cfg.MODEL.name == "mpn_ffd":
-        model = load_checkpoint(args.model_path, cfg, device=device)
-    model.eval()
-
-    # Run app
-    app.run(host=args.host, port=args.port)
+    run_app(args.model_path, args.config_file, args.host, args.port)
