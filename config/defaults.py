@@ -18,11 +18,11 @@ _C.DATA_DIGEST.test_ratio = 0.1
 # MOLECULAR MODEL CONFIG
 # -----------------------------------------------------------------------------
 _C.MODEL = CN()
-_C.MODEL.name = "attention_lstm"
+_C.MODEL.name = "attention_lstm" # or "mpn_ffd"
 _C.MODEL.device = "cuda:0"
 _C.MODEL.num_workers = 4
 _C.MODEL.activation = "ReLU"
-_C.MODEL.loss_function = "binary_cross_entropy"
+_C.MODEL.loss_function = "binary_cross_entropy" #or "cross_entropy "for multiclass
 _C.MODEL.ffn_num_layers = 2
 _C.MODEL.ffn_hidden_size = 300
 _C.MODEL.hidden_size = 300
