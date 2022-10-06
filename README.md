@@ -1,4 +1,4 @@
-# Molecular Property Classification (Sevrier ML Test)
+# Molecular Property Classification (Servier ML Test)
 
 This repository contains two deep neural networks models.
 
